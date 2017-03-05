@@ -16,6 +16,7 @@ var
  */
 function CButtonsView()
 {
+	this.copiedItems = ko.observableArray([]);
 	this.cuttedItems = ko.observableArray([]);
 }
 
@@ -26,16 +27,32 @@ CButtonsView.prototype.useFilesViewData = function (oFilesView)
 	this.listCheckedAndSelected = oFilesView.selector.listCheckedAndSelected;
 	this.moveItems = _.bind(oFilesView.moveItems, oFilesView)
 	this.cutCommand = Utils.createCommand(this, function () {
+		this.copiedItems([]);
 		this.cuttedItems(this.listCheckedAndSelected());
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 	}, function () {
 		return this.listCheckedAndSelected().length > 0;
 	});
-	this.pasteCommand = Utils.createCommand(this, function () {
-		oFilesView.moveItems('Move', oFilesView.getCurrentFolder(), this.cuttedItems());
+	this.copyCommand = Utils.createCommand(this, function () {
+		this.copiedItems(this.listCheckedAndSelected());
 		this.cuttedItems([]);
+		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_COPIED')]);
 	}, function () {
-		return this.cuttedItems().length > 0;
+		return this.listCheckedAndSelected().length > 0;
+	});
+	this.pasteCommand = Utils.createCommand(this, function () {
+		if (this.cuttedItems().length > 0)
+		{
+			oFilesView.moveItems('Move', oFilesView.getCurrentFolder(), this.cuttedItems());
+			this.cuttedItems([]);
+		}
+		if (this.copiedItems().length > 0)
+		{
+			oFilesView.moveItems('Copy', oFilesView.getCurrentFolder(), this.copiedItems());
+			this.copiedItems([]);
+		}
+	}, function () {
+		return this.cuttedItems().length > 0 || this.copiedItems().length > 0;
 	});
 };
 
