@@ -18,6 +18,11 @@ function CButtonsView()
 {
 	this.copiedItems = ko.observableArray([]);
 	this.cuttedItems = ko.observableArray([]);
+	this.pasteTooltip = ko.computed(function () {
+		return TextUtils.i18n('%MODULENAME%/ACTION_PASTE') + ': <br/>' + _.map(_.union(this.cuttedItems(), this.copiedItems()), function (oFile) {
+			return oFile.fileName();
+		}).join(',<br/>');
+	}, this);
 }
 
 CButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
