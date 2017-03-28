@@ -1,14 +1,13 @@
 .toolbar .item {
-	&.cut .icon {
-		background: url("../../images/modules/FilesCutPasteWebclientPlugin/cut-paste.png") no-repeat 0px 0px;
-		opacity: 0.7;
+	&.copy > .icon:before {
+		content: "\e905";
 	}
-	&.copy .icon {
-		background: url("../../images/modules/FilesCutPasteWebclientPlugin/cut-paste.png") no-repeat -35px 0px;
-		opacity: 0.7;
+
+	&.paste > .icon:before {
+		content: "\e908";
 	}
-	&.paste .icon {
-		background: url("../../images/modules/FilesCutPasteWebclientPlugin/cut-paste.png") no-repeat -70px 0px;
-		opacity: 0.7;
+
+	&.cut > .icon:before {
+		content: "\e906";
 	}
 }
