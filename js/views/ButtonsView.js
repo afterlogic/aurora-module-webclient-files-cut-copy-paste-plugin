@@ -19,9 +19,17 @@ function CButtonsView()
 	this.copiedItems = ko.observableArray([]);
 	this.cuttedItems = ko.observableArray([]);
 	this.pasteTooltip = ko.computed(function () {
-		return TextUtils.i18n('%MODULENAME%/ACTION_PASTE') + ': <br/>' + _.map(_.union(this.cuttedItems(), this.copiedItems()), function (oFile) {
-			return oFile.fileName();
-		}).join(',<br/>');
+		var aItems = _.union(this.cuttedItems(), this.copiedItems());
+		if (aItems.length > 0)
+		{
+			return TextUtils.i18n('%MODULENAME%/ACTION_PASTE') + ': <br/>' + _.map(aItems, function (oFile) {
+				return oFile.fileName();
+			}).join(',<br/>');
+		}
+		else
+		{
+			return TextUtils.i18n('%MODULENAME%/ACTION_PASTE');
+		}
 	}, this);
 }
 
@@ -30,7 +38,7 @@ CButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 CButtonsView.prototype.useFilesViewData = function (oFilesView)
 {
 	this.listCheckedAndSelected = oFilesView.selector.listCheckedAndSelected;
-	this.moveItems = _.bind(oFilesView.moveItems, oFilesView)
+	this.moveItems = _.bind(oFilesView.moveItems, oFilesView);
 	this.cutCommand = Utils.createCommand(this, function () {
 		this.copiedItems([]);
 		this.cuttedItems(this.listCheckedAndSelected());
