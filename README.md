@@ -1,1 +1,1 @@
-# aurora-module-webclient-files-cutpaste-plugin
+# Plugin for FilesWebclient module adds cut, copy and paste buttons.
