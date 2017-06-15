@@ -1,11 +1,13 @@
 {
 	"name": "afterlogic/aurora-module-webclient-files-cut-copy-paste-plugin",
-   	"type": "aurora-module",
+	"type": "aurora-module",
 	"require": {
-		"php":">=5.4.0",
+		"php": ">=5.4.0",
 		"afterlogic/aurora-framework": "~0.3"
 	},
 	"extra": {
-		"installer-name": "FilesCutCopyPasteWebclientPlugin"
+		"installer-name": "FilesCutCopyPasteWebclientPlugin",
+		"include-in-mobile": false,
+		"include-in-desktop": true
 	}
 }
