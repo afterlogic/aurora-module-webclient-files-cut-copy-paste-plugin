@@ -67,6 +67,9 @@ CButtonsView.prototype.useFilesViewData = function (oFilesView)
 	}, function () {
 		return this.cuttedItems().length > 0 || this.copiedItems().length > 0;
 	});
+	this.savedItemsCount = ko.computed(function () {
+		return this.cuttedItems().length + this.copiedItems().length;
+	}, this);
 };
 
 module.exports = new CButtonsView();

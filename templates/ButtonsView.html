@@ -8,5 +8,6 @@
 </span>
 <span class="item paste" data-bind="command: pasteCommand, customTooltip: pasteTooltip">
 	<span class="icon"></span>
+	<span class="hint" data-bind="text: savedItemsCount, visible: savedItemsCount() > 0"></span>
 	<span class="text" data-bind="i18n: {'key': '%MODULENAME%/ACTION_PASTE'}"></span>
 </span>
