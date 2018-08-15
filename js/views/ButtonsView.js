@@ -38,20 +38,21 @@ CButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 CButtonsView.prototype.useFilesViewData = function (oFilesView)
 {
 	this.listCheckedAndSelected = oFilesView.selector.listCheckedAndSelected;
+	this.checkedReadyForOperations = oFilesView.checkedReadyForOperations;
 	this.moveItems = _.bind(oFilesView.moveItems, oFilesView);
 	this.cutCommand = Utils.createCommand(this, function () {
 		this.copiedItems([]);
 		this.cuttedItems(this.listCheckedAndSelected());
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 	}, function () {
-		return this.listCheckedAndSelected().length > 0;
+		return this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0;
 	});
 	this.copyCommand = Utils.createCommand(this, function () {
 		this.copiedItems(this.listCheckedAndSelected());
 		this.cuttedItems([]);
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_COPIED')]);
 	}, function () {
-		return this.listCheckedAndSelected().length > 0;
+		return this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0;
 	});
 	this.pasteCommand = Utils.createCommand(this, function () {
 		if (this.cuttedItems().length > 0)
