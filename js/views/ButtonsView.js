@@ -14,7 +14,7 @@ var
 /**
  * @constructor
  */
-function CButtonsView()
+function ButtonsView()
 {
 	this.copiedItems = ko.observableArray([]);
 	this.cuttedItems = ko.observableArray([]);
@@ -31,12 +31,22 @@ function CButtonsView()
 			return TextUtils.i18n('%MODULENAME%/ACTION_PASTE');
 		}
 	}, this);
+	this.storageType = null;
+	this.cutButtonModules = ko.observableArray([]);	//list of modules that disable "cut" button
+	this.pasteButtonModules = ko.observableArray([]);	//list of modules that disable "paste" button
+	this.isDisabledCutButton = ko.computed(function () {
+		return this.cutButtonModules().length > 0;
+	}, this);
+	this.isDisabledPasteButton = ko.computed(function () {
+		return this.pasteButtonModules().length > 0;
+	}, this);
 }
 
-CButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
+ButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 
-CButtonsView.prototype.useFilesViewData = function (oFilesView)
+ButtonsView.prototype.useFilesViewData = function (oFilesView)
 {
+	this.storageType = oFilesView.storageType;
 	this.listCheckedAndSelected = oFilesView.selector.listCheckedAndSelected;
 	this.checkedReadyForOperations = oFilesView.checkedReadyForOperations;
 	this.moveItems = _.bind(oFilesView.moveItems, oFilesView);
@@ -45,7 +55,7 @@ CButtonsView.prototype.useFilesViewData = function (oFilesView)
 		this.cuttedItems(this.listCheckedAndSelected());
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 	}, function () {
-		return this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0;
+		return this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0 && !this.isDisabledCutButton();
 	});
 	this.copyCommand = Utils.createCommand(this, function () {
 		this.copiedItems(this.listCheckedAndSelected());
@@ -66,11 +76,66 @@ CButtonsView.prototype.useFilesViewData = function (oFilesView)
 			this.copiedItems([]);
 		}
 	}, function () {
-		return this.cuttedItems().length > 0 || this.copiedItems().length > 0;
+		return ((this.cuttedItems().length > 0 || this.copiedItems().length > 0) && !this.isDisabledPasteButton());
 	});
 	this.savedItemsCount = ko.computed(function () {
 		return this.cuttedItems().length + this.copiedItems().length;
 	}, this);
+	oFilesView.pathItems.subscribe(function () {
+		var
+			iPathItemsLength = oFilesView.pathItems().length,
+			oLastPathItem = oFilesView.pathItems()[iPathItemsLength - 1] || false
+		;
+
+		//Disable toolbar buttons for "root" directory of Shared files
+		//and for folders with access level "Read"
+		if (!this.isSharedStorage()
+			|| (iPathItemsLength !== 0
+				&& oLastPathItem.oExtendedProps
+				&& oLastPathItem.oExtendedProps.Access
+				&& oLastPathItem.oExtendedProps.Access === Enums.SharedFileAccess.Write
+			)
+		)
+		{
+			this.enableButton(this.pasteButtonModules, '%ModuleName%');
+		}
+		else
+		{
+			this.disableButton(this.pasteButtonModules, '%ModuleName%');
+		}
+		//Disable delete buttons for folders with access level "Read"
+		if (this.isSharedStorage()
+			&& iPathItemsLength !== 0
+			&& oLastPathItem.oExtendedProps
+			&& oLastPathItem.oExtendedProps.Access
+			&& oLastPathItem.oExtendedProps.Access !== Enums.SharedFileAccess.Write
+		)
+		{
+			this.disableButton(this.cutButtonModules, '%ModuleName%');
+		}
+		else
+		{
+			this.enableButton(this.cutButtonModules, '%ModuleName%');
+		}
+	}, this);
 };
 
-module.exports = new CButtonsView();
+ButtonsView.prototype.disableButton = function (koButtonModules, sModuleName)
+{
+	if (koButtonModules.indexOf(sModuleName) === -1)
+	{
+		koButtonModules.push(sModuleName);
+	}
+};
+
+ButtonsView.prototype.enableButton = function (koButtonModules, sModuleName)
+{
+	koButtonModules.remove(sModuleName);
+};
+
+ButtonsView.prototype.isSharedStorage = function ()
+{
+	return this.storageType() === Enums.FileStorageType.Shared;
+};
+
+module.exports = new ButtonsView();
