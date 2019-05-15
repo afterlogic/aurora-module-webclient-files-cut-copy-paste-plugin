@@ -1,13 +1,9 @@
 'use strict';
 
 module.exports = function (oAppData) {
-	var
-		App = require('%PathToCoreWebclientModule%/js/App.js'),
-		
-		bNormalUser = App.getUserRole() === window.Enums.UserRole.NormalUser
-	;
+	var App = require('%PathToCoreWebclientModule%/js/App.js');
 
-	if (bNormalUser)
+	if (App.isUserNormalOrTenant())
 	{
 		return {
 			start: function (ModulesManager) {
