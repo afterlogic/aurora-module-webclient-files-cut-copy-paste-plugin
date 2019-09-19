@@ -89,12 +89,13 @@ ButtonsView.prototype.useFilesViewData = function (oFilesView)
 
 		//Disable toolbar buttons for "root" directory of Shared files
 		//and for folders with access level "Read"
-		if (!this.isSharedStorage()
+		if ((!this.isSharedStorage()
 			|| (iPathItemsLength !== 0
 				&& oLastPathItem.oExtendedProps
 				&& oLastPathItem.oExtendedProps.Access
 				&& oLastPathItem.oExtendedProps.Access === Enums.SharedFileAccess.Write
-			)
+			))
+			&& !this.isEncryptedStorage()
 		)
 		{
 			this.enableButton(this.pasteButtonModules, '%ModuleName%');
@@ -137,5 +138,11 @@ ButtonsView.prototype.isSharedStorage = function ()
 {
 	return this.storageType() === Enums.FileStorageType.Shared;
 };
+
+ButtonsView.prototype.isEncryptedStorage = function ()
+{
+	return this.storageType() === 'encrypted';
+};
+
 
 module.exports = new ButtonsView();
