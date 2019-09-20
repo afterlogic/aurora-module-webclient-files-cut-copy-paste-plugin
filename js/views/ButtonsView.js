@@ -32,6 +32,7 @@ function ButtonsView()
 		}
 	}, this);
 	this.storageType = null;
+	this.getStorageByType = null;
 	this.cutButtonModules = ko.observableArray([]);	//list of modules that disable "cut" button
 	this.pasteButtonModules = ko.observableArray([]);	//list of modules that disable "paste" button
 	this.isDisabledCutButton = ko.computed(function () {
@@ -46,6 +47,7 @@ ButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 
 ButtonsView.prototype.useFilesViewData = function (oFilesView)
 {
+	this.getStorageByType = _.bind(oFilesView.getStorageByType, oFilesView);
 	this.storageType = oFilesView.storageType;
 	this.listCheckedAndSelected = oFilesView.selector.listCheckedAndSelected;
 	this.checkedReadyForOperations = oFilesView.checkedReadyForOperations;
@@ -95,7 +97,7 @@ ButtonsView.prototype.useFilesViewData = function (oFilesView)
 				&& oLastPathItem.oExtendedProps.Access
 				&& oLastPathItem.oExtendedProps.Access === Enums.SharedFileAccess.Write
 			))
-			&& !this.isEncryptedStorage()
+			&& this.isDropAllowedToStorage()
 		)
 		{
 			this.enableButton(this.pasteButtonModules, '%ModuleName%');
@@ -139,9 +141,10 @@ ButtonsView.prototype.isSharedStorage = function ()
 	return this.storageType() === Enums.FileStorageType.Shared;
 };
 
-ButtonsView.prototype.isEncryptedStorage = function ()
+ButtonsView.prototype.isDropAllowedToStorage = function ()
 {
-	return this.storageType() === 'encrypted';
+	var oStorage = this.getStorageByType(this.storageType());
+	return oStorage && oStorage.droppable === false ? false : true;
 };
 
 
