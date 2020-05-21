@@ -55,14 +55,17 @@ ButtonsView.prototype.useFilesViewData = function (oFilesView)
 		this.cuttedItems(this.listCheckedAndSelected());
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 	}, function () {
-		return this.storageType() !== Enums.FileStorageType.Shared && this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0 && !this.isDisabledCutButton();
+		return	!oFilesView.isZipFolder() && this.storageType() !== Enums.FileStorageType.Shared
+				&& this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0
+				&& !this.isDisabledCutButton();
 	});
 	this.copyCommand = Utils.createCommand(this, function () {
 		this.copiedItems(this.listCheckedAndSelected());
 		this.cuttedItems([]);
 		Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_COPIED')]);
 	}, function () {
-		return this.storageType() !== Enums.FileStorageType.Shared && this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0;
+		return	!oFilesView.isZipFolder() && this.storageType() !== Enums.FileStorageType.Shared
+				&& this.checkedReadyForOperations() && this.listCheckedAndSelected().length > 0;
 	});
 	this.pasteCommand = Utils.createCommand(this, function () {
 		if (this.cuttedItems().length > 0)
@@ -76,7 +79,9 @@ ButtonsView.prototype.useFilesViewData = function (oFilesView)
 			this.copiedItems([]);
 		}
 	}, function () {
-		return this.storageType() !== Enums.FileStorageType.Shared && ((this.cuttedItems().length > 0 || this.copiedItems().length > 0) && !this.isDisabledPasteButton());
+		return	!oFilesView.isZipFolder() && this.storageType() !== Enums.FileStorageType.Shared
+				&& ((this.cuttedItems().length > 0 || this.copiedItems().length > 0)
+				&& !this.isDisabledPasteButton());
 	});
 	this.savedItemsCount = ko.computed(function () {
 		return this.cuttedItems().length + this.copiedItems().length;
