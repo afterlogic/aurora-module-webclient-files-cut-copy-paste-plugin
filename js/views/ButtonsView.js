@@ -41,18 +41,9 @@ function СButtonsView()
 		return this.cuttedItems().length + this.copiedItems().length;
 	}, this);
 	
-	this.isCutAllowed = ko.computed(function () {
-		var aItems = oFilesView.selector.listCheckedAndSelected();
-		return	!oFilesView.isZipFolder() && !oFilesView.sharedParentFolder()
-				&& aItems.length > 0 && oFilesView.allSelectedItemsNotShared()
-				&& oFilesView.allSelectedFilesReady();
-	}, this);
-	this.cutCommand = Utils.createCommand(this, this.executeCut, this.isCutAllowed);
+	this.cutCommand = Utils.createCommand(this, this.executeCut, oFilesView.isCutAllowed);
 
-	this.isCopyAllowed = ko.computed(function () {
-		return oFilesView.allSelectedFilesReady() && oFilesView.selector.listCheckedAndSelected().length > 0;
-	}, this);
-	this.copyCommand = Utils.createCommand(this, this.executeCopy, this.isCopyAllowed);
+	this.copyCommand = Utils.createCommand(this, this.executeCopy, oFilesView.isCopyAllowed);
 
 	this.isPasteAllowed = ko.computed(function () {
 		var oSharedParentFolder = oFilesView.sharedParentFolder();
