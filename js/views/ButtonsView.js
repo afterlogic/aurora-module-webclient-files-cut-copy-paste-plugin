@@ -19,6 +19,12 @@ function СButtonsView()
 	this.oFilesView = null;
 	this.copiedItems = ko.observableArray([]);
 	this.cuttedItems = ko.observableArray([]);
+	this.sharedParentFolderWhereItemsCutFrom = ko.observable(null);
+
+	this.savedItemsCount = ko.computed(function () {
+		return this.cuttedItems().length + this.copiedItems().length;
+	}, this);
+	
 	this.pasteTooltip = ko.computed(function () {
 		var aItems = _.union(this.cuttedItems(), this.copiedItems());
 		if (aItems.length > 0) {
@@ -29,27 +35,50 @@ function СButtonsView()
 			return TextUtils.i18n('%MODULENAME%/ACTION_PASTE');
 		}
 	}, this);
+
+	this.cuttedItemsHasShared = ko.computed(function () {
+		return !!_.find(this.cuttedItems(), function(item) {
+			return item.bSharedWithMe;
+		});
+	}, this);
 }
 
 СButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 
-СButtonsView.prototype.useFilesViewData = function (oFilesView)
+СButtonsView.prototype.useFilesViewData = function (filesView)
 {
-	this.oFilesView = oFilesView;
+	this.oFilesView = filesView;
 
-	this.savedItemsCount = ko.computed(function () {
-		return this.cuttedItems().length + this.copiedItems().length;
-	}, this);
-	
-	this.cutCommand = Utils.createCommand(this, this.executeCut, oFilesView.isCutAllowed);
+	this.cutCommand = Utils.createCommand(this, this.executeCut, filesView.isCutAllowed);
 
-	this.copyCommand = Utils.createCommand(this, this.executeCopy, oFilesView.isCopyAllowed);
+	this.copyCommand = Utils.createCommand(this, this.executeCopy, filesView.isCopyAllowed);
 
 	this.isPasteAllowed = ko.computed(function () {
-		var oSharedParentFolder = oFilesView.sharedParentFolder();
-		return	this.savedItemsCount() > 0
-				&& (!oFilesView.isSharedStorage() && !oSharedParentFolder
-				|| oSharedParentFolder && oSharedParentFolder.bSharedWithMeAccessWrite);
+		var
+			allowPaste = false,
+			sharedParentFolder = filesView.sharedParentFolder()
+		;
+		if (this.copiedItems().length > 0) {
+			allowPaste = !filesView.isSharedStorage() && !sharedParentFolder
+				|| sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+		}
+		if (this.cuttedItems().length > 0) {
+			if (this.cuttedItemsHasShared()) {
+				if (this.sharedParentFolderWhereItemsCutFrom()) {
+					allowPaste = sharedParentFolder
+								 && sharedParentFolder.storageType() === this.sharedParentFolderWhereItemsCutFrom().storageType()
+								 && sharedParentFolder.fullPath() === this.sharedParentFolderWhereItemsCutFrom().fullPath();
+				} else {
+					allowPaste = filesView.storageType() === Enums.FileStorageType.Personal && !sharedParentFolder;
+				}
+			} else {
+				allowPaste = filesView.storageType() === Enums.FileStorageType.Personal
+							 && (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+							 || filesView.isCorporateStorage()
+							 || filesView.isSharedStorage() && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+			}
+		}
+		return allowPaste;
 	}, this);
 	this.pasteCommand = Utils.createCommand(this, this.executePaste, this.isPasteAllowed);
 };
@@ -58,6 +87,7 @@ function СButtonsView()
 {
 	this.copiedItems([]);
 	this.cuttedItems(this.oFilesView.selector.listCheckedAndSelected());
+	this.sharedParentFolderWhereItemsCutFrom(this.oFilesView.sharedParentFolder());
 	Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 };
 
