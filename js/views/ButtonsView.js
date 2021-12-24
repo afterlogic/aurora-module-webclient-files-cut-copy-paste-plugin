@@ -3,10 +3,10 @@
 var
 	_ = require('underscore'),
 	ko = require('knockout'),
-	
+
 	TextUtils = require('%PathToCoreWebclientModule%/js/utils/Text.js'),
 	Utils = require('%PathToCoreWebclientModule%/js/utils/Common.js'),
-	
+
 	Popups = require('%PathToCoreWebclientModule%/js/Popups.js'),
 	AlertPopup = require('%PathToCoreWebclientModule%/js/popups/AlertPopup.js')
 ;
@@ -24,7 +24,7 @@ function СButtonsView()
 	this.savedItemsCount = ko.computed(function () {
 		return this.cuttedItems().length + this.copiedItems().length;
 	}, this);
-	
+
 	this.pasteTooltip = ko.computed(function () {
 		var aItems = _.union(this.cuttedItems(), this.copiedItems());
 		if (aItems.length > 0) {
@@ -34,12 +34,6 @@ function СButtonsView()
 		} else {
 			return TextUtils.i18n('%MODULENAME%/ACTION_PASTE');
 		}
-	}, this);
-
-	this.cuttedItemsHasShared = ko.computed(function () {
-		return !!_.find(this.cuttedItems(), function(item) {
-			return item.bSharedWithMe;
-		});
 	}, this);
 }
 
@@ -60,23 +54,13 @@ function СButtonsView()
 		;
 		if (this.copiedItems().length > 0) {
 			allowPaste = !filesView.isSharedStorage() && !sharedParentFolder
-				|| sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+						 || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
 		}
 		if (this.cuttedItems().length > 0) {
-			if (this.cuttedItemsHasShared()) {
-				if (this.sharedParentFolderWhereItemsCutFrom()) {
-					allowPaste = sharedParentFolder
-								 && sharedParentFolder.storageType() === this.sharedParentFolderWhereItemsCutFrom().storageType()
-								 && sharedParentFolder.fullPath() === this.sharedParentFolderWhereItemsCutFrom().fullPath();
-				} else {
-					allowPaste = filesView.storageType() === Enums.FileStorageType.Personal && !sharedParentFolder;
-				}
-			} else {
-				allowPaste = filesView.storageType() === Enums.FileStorageType.Personal
-							 && (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
-							 || filesView.isCorporateStorage()
-							 || filesView.isSharedStorage() && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
-			}
+			allowPaste = filesView.storageType() === Enums.FileStorageType.Personal
+						 && (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+						 || filesView.isCorporateStorage()
+						 || filesView.isSharedStorage() && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
 		}
 		return allowPaste;
 	}, this);
