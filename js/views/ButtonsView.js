@@ -54,13 +54,13 @@ function СButtonsView()
 		;
 		if (this.copiedItems().length > 0) {
 			allowPaste = !filesView.isSharedStorage() && !sharedParentFolder
-						 || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+						 || sharedParentFolder && sharedParentFolder.sharedWithMeAccessWrite();
 		}
 		if (this.cuttedItems().length > 0) {
 			allowPaste = filesView.storageType() === Enums.FileStorageType.Personal
-						 && (!sharedParentFolder || sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite)
+						 && (!sharedParentFolder || sharedParentFolder && sharedParentFolder.sharedWithMeAccessWrite())
 						 || filesView.isCorporateStorage()
-						 || filesView.isSharedStorage() && sharedParentFolder && sharedParentFolder.bSharedWithMeAccessWrite;
+						 || filesView.isSharedStorage() && sharedParentFolder && sharedParentFolder.sharedWithMeAccessWrite();
 		}
 		return allowPaste;
 	}, this);
