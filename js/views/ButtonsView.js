@@ -11,10 +11,12 @@ var
 	AlertPopup = require('%PathToCoreWebclientModule%/js/popups/AlertPopup.js')
 ;
 
+CButtonsView
+
 /**
- * @constructor
+ * @constructor 
  */
-function СButtonsView()
+function CButtonsView()
 {
 	this.oFilesView = null;
 	this.copiedItems = ko.observableArray([]);
@@ -37,9 +39,9 @@ function СButtonsView()
 	}, this);
 }
 
-СButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
+CButtonsView.prototype.ViewTemplate = '%ModuleName%_ButtonsView';
 
-СButtonsView.prototype.useFilesViewData = function (filesView)
+CButtonsView.prototype.useFilesViewData = function (filesView)
 {
 	this.oFilesView = filesView;
 
@@ -67,7 +69,7 @@ function СButtonsView()
 	this.pasteCommand = Utils.createCommand(this, this.executePaste, this.isPasteAllowed);
 };
 
-СButtonsView.prototype.executeCut = function ()
+CButtonsView.prototype.executeCut = function ()
 {
 	this.copiedItems([]);
 	this.cuttedItems(this.oFilesView.selector.listCheckedAndSelected());
@@ -75,14 +77,14 @@ function СButtonsView()
 	Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_CUTTED')]);
 };
 
-СButtonsView.prototype.executeCopy = function ()
+CButtonsView.prototype.executeCopy = function ()
 {
 	this.copiedItems(this.oFilesView.selector.listCheckedAndSelected());
 	this.cuttedItems([]);
 	Popups.showPopup(AlertPopup, [TextUtils.i18n('%MODULENAME%/INFO_ITEMS_COPIED')]);
 };
 
-СButtonsView.prototype.executePaste = function ()
+CButtonsView.prototype.executePaste = function ()
 {
 	if (this.cuttedItems().length > 0) {
 		this.oFilesView.moveItems('Move', this.oFilesView.getCurrentFolder(), this.cuttedItems());
@@ -94,4 +96,4 @@ function СButtonsView()
 	}
 };
 
-module.exports = new СButtonsView();
+module.exports = new CButtonsView();
